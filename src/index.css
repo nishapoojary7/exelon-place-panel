@@ -1,9 +1,9 @@
-/* ------------------ Basic Reset ------------------ */
+/* ==================== BASIC RESET ==================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 body {
@@ -16,7 +16,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ------------------ Overlay ------------------ */
+/* ==================== OVERLAY ==================== */
 .overlay {
   position: fixed;
   top: 0;
@@ -29,13 +29,13 @@ body {
   z-index: 10;
 }
 
-/* ------------------ Panel ------------------ */
+/* ==================== PANEL ==================== */
 .panel {
   background-color: #fff;
   border-radius: 12px;
   width: 360px;
   max-width: 100%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   padding: 20px;
   opacity: 0;
   transform: translateY(20px);
@@ -44,13 +44,16 @@ body {
   position: relative;
 }
 
-/* Show Panel */
 .panel.show {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ------------------ Loading ------------------ */
+.panel.dragging {
+  transition: none;
+}
+
+/* ==================== LOADING STATE ==================== */
 .panel.loading {
   display: flex;
   justify-content: center;
@@ -66,34 +69,48 @@ body {
   50% { opacity: 1; }
 }
 
-/* ------------------ Handle Bar ------------------ */
+/* ==================== HANDLE BAR ==================== */
 .handle-bar {
   width: 40px;
   height: 4px;
   background-color: #ccc;
   border-radius: 2px;
   margin: 8px auto 12px auto;
+  cursor: grab;
+  transition: background-color 0.2s ease;
 }
 
-/* ------------------ Header ------------------ */
+.handle-bar:active {
+  cursor: grabbing;
+  background-color: #999;
+}
+
+/* ==================== PANEL HEADER ==================== */
+.panel-header {
+  margin-bottom: 15px;
+}
+
 .panel-header .title {
   font-size: 1.4rem;
+  font-weight: 600;
   margin-bottom: 5px;
+  color: #202124;
 }
 
 .panel-header .address {
   font-size: 0.9rem;
   color: #666;
   margin-bottom: 8px;
+  line-height: 1.4;
 }
 
 .rating {
   font-size: 0.9rem;
   color: #333;
-  margin-bottom: 15px;
+  font-weight: 500;
 }
 
-/* ------------------ Action Buttons ------------------ */
+/* ==================== ACTION BUTTONS ==================== */
 .actions {
   display: flex;
   gap: 10px;
@@ -102,21 +119,33 @@ body {
 
 .actions button {
   flex: 1;
-  padding: 8px;
+  padding: 10px 8px;
   background-color: #4285f4;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background-color 0.3s ease;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .actions button:hover {
   background-color: #3367d6;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
 }
 
-/* ------------------ Hours ------------------ */
+.actions button:active {
+  background-color: #2950a9;
+  transform: scale(0.98);
+}
+
+.actions button:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
+/* ==================== HOURS SECTION ==================== */
 .hours {
   cursor: pointer;
   font-size: 0.95rem;
@@ -124,20 +153,30 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 8px 0;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+}
+
+.hours:hover {
+  background-color: #f9f9f9;
+}
+
+.status {
+  font-weight: bold;
 }
 
 .status.open {
-  color: green;
-  font-weight: bold;
+  color: #34a853;
 }
 
 .status.closed {
-  color: red;
-  font-weight: bold;
+  color: #ea4335;
 }
 
 .arrow {
   margin-left: 5px;
+  font-size: 0.7rem;
   transition: transform 0.3s ease;
 }
 
@@ -145,19 +184,37 @@ body {
   transform: rotate(-180deg);
 }
 
-/* Expandable hours list */
+/* Hours list */
 .hours-list {
   list-style: none;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease;
+  margin-bottom: 15px;
 }
 
 .hours-list.show {
   max-height: 300px;
 }
 
-/* ------------------ Gallery ------------------ */
+.hours-list li {
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #555;
+  border-bottom: 1px solid #eee;
+}
+
+.hours-list li:last-child {
+  border-bottom: none;
+}
+
+.hours-list strong {
+  display: inline-block;
+  min-width: 80px;
+  color: #333;
+}
+
+/* ==================== GALLERY ==================== */
 .gallery {
   display: flex;
   overflow-x: auto;
@@ -165,23 +222,33 @@ body {
   margin-top: 15px;
   scroll-snap-type: x mandatory;
   padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .gallery img {
   height: 120px;
   width: 120px;
+  min-width: 120px;
   border-radius: 8px;
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.3s ease;
   scroll-snap-align: start;
+  -webkit-user-drag: none;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .gallery img:hover {
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ------------------ Responsive / Mobile ------------------ */
+.gallery img:active {
+  transform: scale(0.98);
+}
+
+/* ==================== TABLET (768px and below) ==================== */
 @media (max-width: 768px) {
   body {
     padding: 0;
@@ -194,27 +261,90 @@ body {
     border-radius: 20px 20px 0 0;
     max-height: 90vh;
     transform: translateY(100%);
-    transition: transform 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: fixed;
     bottom: 0;
     left: 0;
+    overflow-y: auto;
+    padding: 16px;
   }
 
   .panel.show {
     transform: translateY(0);
   }
 
-  /* Full-width gallery images on mobile */
-  .gallery img {
-    width: 80%;
-    height: auto;
+  .panel.dragging {
+    transition: none;
   }
 
-  /* Increase handle bar visibility on mobile */
   .handle-bar {
     width: 60px;
     height: 5px;
     margin: 10px auto 15px auto;
     background-color: #bbb;
+  }
+
+  .panel-header .title {
+    font-size: 1.2rem;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .actions button {
+    font-size: 0.8rem;
+    padding: 8px 6px;
+  }
+
+  .gallery img {
+    height: 100px;
+    width: 100px;
+    min-width: 100px;
+  }
+}
+
+/* ==================== MOBILE (480px and below) ==================== */
+@media (max-width: 480px) {
+  .panel {
+    padding: 12px;
+  }
+
+  .panel-header .title {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+
+  .panel-header .address {
+    font-size: 0.85rem;
+  }
+
+  .rating {
+    font-size: 0.85rem;
+  }
+
+  .actions {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .actions button {
+    font-size: 0.75rem;
+    padding: 6px 4px;
+  }
+
+  .hours {
+    font-size: 0.9rem;
+  }
+
+  .gallery {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .gallery img {
+    height: 80px;
+    width: 80px;
+    min-width: 80px;
   }
 }

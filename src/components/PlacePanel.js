@@ -1,37 +1,54 @@
 import { useState, useEffect, useRef } from "react";
 import placeData from "../data/placeData";
+import "../index.css";
 
 export default function PlacePanel() {
   const [loading, setLoading] = useState(true);
   const [showHours, setShowHours] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [translateY, setTranslateY] = useState(0);
+  const [panelOffset, setPanelOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const panelRef = useRef(null);
   const startY = useRef(0);
 
+  // Loading effect
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1200);
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
+  // Prevent body scroll when panel is open
+  useEffect(() => {
+    document.body.style.overflow = panelOffset < 100 ? 'hidden' : '';
+    return () => { 
+      document.body.style.overflow = ''; 
+    };
+  }, [panelOffset]);
+
   const handleTouchStart = (e) => {
-    setDragging(true);
+    setIsDragging(true);
     startY.current = e.touches[0].clientY;
   };
 
   const handleTouchMove = (e) => {
-    if (!dragging) return;
+    if (!isDragging) return;
     const deltaY = e.touches[0].clientY - startY.current;
-    if (deltaY > 0) setTranslateY(deltaY);
+    if (deltaY > 0) {
+      setPanelOffset(deltaY);
+    }
   };
 
   const handleTouchEnd = () => {
-    setDragging(false);
-    if (translateY > 150) {
-      // close the panel
-      panelRef.current.style.transform = `translateY(100%)`;
+    setIsDragging(false);
+    // If dragged down more than 150px, close it
+    if (panelOffset > 150) {
+      setPanelOffset(window.innerHeight);
     } else {
-      setTranslateY(0);
+      setPanelOffset(0);
     }
+  };
+
+  const closePanel = () => {
+    setPanelOffset(window.innerHeight);
   };
 
   if (loading) {
@@ -42,14 +59,20 @@ export default function PlacePanel() {
     <>
       <div
         className="overlay"
-        style={{ opacity: translateY === 0 ? 0.3 : 0, pointerEvents: translateY === 0 ? "auto" : "none" }}
-        onClick={() => (panelRef.current.style.transform = "translateY(100%)")}
-      ></div>
+        style={{
+          opacity: panelOffset === 0 ? 0.3 : 0,
+          pointerEvents: panelOffset === 0 ? "auto" : "none"
+        }}
+        onClick={closePanel}
+      />
 
       <div
-        className={`panel ${!loading ? "show" : ""}`}
+        className={`panel show ${isDragging ? "dragging" : ""}`}
         ref={panelRef}
-        style={{ transform: `translateY(${translateY}px)` }}
+        style={{
+          transform: `translateY(${panelOffset}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s ease'
+        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -66,7 +89,7 @@ export default function PlacePanel() {
 
         {/* Action Buttons */}
         <div className="actions">
-          <button onClick={() => window.open("tel:+919148448704")}>Call</button>
+          
           <button onClick={() => window.open("https://exeloncircuits.com/", "_blank")}>
             Website
           </button>
@@ -89,8 +112,8 @@ export default function PlacePanel() {
         >
           <span className={`status ${placeData.status === "Open" ? "open" : "closed"}`}>
             {placeData.status}
-          </span>{" "}
-          · 9:00 AM – 6:00 PM
+          </span>
+          {" "} · 9:00 AM – 6:00 PM
           <span className={`arrow ${showHours ? "up" : "down"}`}>▼</span>
         </div>
 
@@ -102,7 +125,7 @@ export default function PlacePanel() {
           ))}
         </ul>
 
-        {/* Scroll Snap Gallery */}
+        {/* Photo Gallery */}
         <div className="gallery">
           {placeData.images.map((img, index) => (
             <img key={index} src={img} alt={`place-${index}`} />

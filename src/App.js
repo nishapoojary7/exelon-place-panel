@@ -1,8 +1,12 @@
-import PlacePanel from "./components/PlacePanel";
-import "./index.css";
+import PlacePanel from './components/PlacePanel';
+import './App.css';
 
 function App() {
-  return <PlacePanel />;
+  return (
+    <div className="App">
+      <PlacePanel />
+    </div>
+  );
 }
 
 export default App;
