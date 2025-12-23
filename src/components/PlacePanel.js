@@ -39,11 +39,11 @@ export default function PlacePanel() {
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    // If dragged down more than 150px, close it
-    if (panelOffset > 150) {
-      setPanelOffset(window.innerHeight);
+    const threshold = 150;
+    if (panelOffset > threshold) {
+      setPanelOffset(window.innerHeight); // slide down and close
     } else {
-      setPanelOffset(0);
+      setPanelOffset(0); // snap back
     }
   };
 
@@ -57,27 +57,28 @@ export default function PlacePanel() {
 
   return (
     <>
+      {/* Overlay */}
       <div
         className="overlay"
         style={{
-          opacity: panelOffset === 0 ? 0.3 : 0,
+          opacity: Math.max(0, 0.3 * (1 - panelOffset / 300)),
           pointerEvents: panelOffset === 0 ? "auto" : "none"
         }}
         onClick={closePanel}
       />
 
+      {/* Panel */}
       <div
         className={`panel show ${isDragging ? "dragging" : ""}`}
         ref={panelRef}
         style={{
           transform: `translateY(${panelOffset}px)`,
-          transition: isDragging ? 'none' : 'transform 0.3s ease'
+          transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Handle Bar */}
         <div className="handle-bar"></div>
 
         {/* Header */}
@@ -89,9 +90,8 @@ export default function PlacePanel() {
 
         {/* Action Buttons */}
         <div className="actions">
-          
           <button onClick={() => window.open("https://exeloncircuits.com/", "_blank")}>
-            Website
+            🌐 Website
           </button>
           <button
             onClick={() =>
@@ -101,7 +101,7 @@ export default function PlacePanel() {
               )
             }
           >
-            Directions
+            🧭 Directions
           </button>
         </div>
 
